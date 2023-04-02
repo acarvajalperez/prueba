@@ -4,7 +4,7 @@ import com.flowingcode.vaadin.addons.fontawesome.FontAwesome;
 import es.opplus.application.components.ColorSelect;
 import es.opplus.application.components.IconSelect;
 import es.opplus.application.components.dialogs.events.FormDialogOkEvent;
-import es.opplus.application.components.layout.events.AddFilterEvent;
+import es.opplus.application.components.layout.events.AddPersonFilterEvent;
 import es.opplus.application.data.AddPersonFilterEventData;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.Key;
@@ -73,7 +73,7 @@ public class AddFilterDialogForm extends AbstractDialogForm  {
         if (isValid()) {
             ComponentUtil.fireEvent(
                     UI.getCurrent(),
-                    new AddFilterEvent(
+                    new AddPersonFilterEvent(
                             this,
                             false,
                             getValue()

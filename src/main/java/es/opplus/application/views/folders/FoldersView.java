@@ -1,8 +1,10 @@
 package es.opplus.application.views.folders;
 
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.router.*;
 import es.opplus.application.components.dialogs.AddFilterDialogForm;
 import es.opplus.application.components.dialogs.FormDialog;
+import es.opplus.application.components.views.FilterView;
 import es.opplus.application.data.PersonFilterData;
 import es.opplus.application.data.entity.SamplePerson;
 import es.opplus.application.data.service.SamplePersonService;
@@ -25,8 +27,6 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.springframework.data.domain.PageRequest;
@@ -43,14 +43,17 @@ import java.util.stream.Collectors;
 @RolesAllowed({"USER","FOLDERS"})
 
 @Uses(Icon.class)
-public class FoldersView extends Div {
+public class FoldersView extends FilterView<PersonFilterData> {
 
+    public Binder<PersonFilterData> personDataBinder = new Binder<>();
     private Grid<SamplePerson> grid;
     private Filters filters;
     private final SamplePersonService samplePersonService;
+    private PersonFilterData personFilterData;
 
     public FoldersView(SamplePersonService SamplePersonService) {
         this.samplePersonService = SamplePersonService;
+        personFilterData = new PersonFilterData();
         setSizeFull();
         addClassNames("gridwith-filters-view");
 
@@ -86,9 +89,18 @@ public class FoldersView extends Div {
         return mobileFilters;
     }
 
-    public static class Filters extends Div implements Specification<SamplePerson> {
+    @Override
+    public void setFilter(PersonFilterData personFilterData) {
+        this.personFilterData = personFilterData;
+        personDataBinder.setBean(personFilterData);
+        refreshGrid();
 
-        Binder<PersonFilterData> personDataBinder = new Binder<>();
+        System.out.println("Ha llegado el parametro " + personFilterData);
+    }
+
+
+    public class Filters extends Div implements Specification<SamplePerson> {
+
         private final TextField name = new TextField("Name");
         private final TextField phone = new TextField("Phone");
         private final DatePicker startDate = new DatePicker("Date of Birth");
@@ -104,6 +116,7 @@ public class FoldersView extends Div {
             personDataBinder.forField(phone)
                     .bind(PersonFilterData::getPhone, PersonFilterData::setPhone);
 
+            personDataBinder.setBean(personFilterData);
 
             setWidthFull();
             addClassName("filter-layout");
@@ -118,20 +131,6 @@ public class FoldersView extends Div {
 
             // Action buttons
             Button filterBtn = new Button("Guardar como filtro");
-            System.out.println(this.getChildren().collect(Collectors.toList()));
-            String filter = this.getChildren().collect(Collectors.toList()).toString();
-                    /*
-            for (Component child : this.getChildren().collect(Collectors.toList())) {
-                if (id.equals(child.getId())) {
-                    return child; // found it!
-                } else if (child instanceof HasComponents) { // recursively go through all children that themselves have children
-                    Component result = findComponentById((HasComponents) child, id);
-                    if (result != null) {
-                        return result;
-                    }
-                }
-            }
-                     */
             filterBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             filterBtn.addClickListener(event -> {
                 new FormDialog(new AddFilterDialogForm(personDataBinder.getBean())).open();

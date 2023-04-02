@@ -1,5 +1,6 @@
 package es.opplus.application;
 
+import com.vaadin.flow.server.PWA;
 import es.opplus.application.data.service.SamplePersonRepository;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.page.AppShellConfigurator;
@@ -26,6 +27,12 @@ import javax.sql.DataSource;
 @NpmPackage(value = "@fontsource/lato", version = "4.5.0")
 @NpmPackage(value = "line-awesome", version = "1.3.0")
 @NpmPackage(value = "@vaadin-component-factory/vcf-nav", version = "1.0.6")
+
+@PWA(name = "Picasso",
+        shortName = "Picasso",
+        offlinePath = "offline.html",
+        iconPath = "icons/icon.png")
+
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {

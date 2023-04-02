@@ -4,11 +4,11 @@ import es.opplus.application.data.AddPersonFilterEventData;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 
-public class AddFilterEvent extends ComponentEvent<Component> {
+public class AddPersonFilterEvent extends ComponentEvent<Component> {
 
     AddPersonFilterEventData filter;
 
-    public AddFilterEvent(Component source, boolean fromClient, AddPersonFilterEventData filter) {
+    public AddPersonFilterEvent(Component source, boolean fromClient, AddPersonFilterEventData filter) {
         super(source, fromClient);
         this.filter = filter;
     }

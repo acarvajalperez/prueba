@@ -1,24 +1,23 @@
 package es.opplus.application;
 
+import com.flowingcode.vaadin.addons.fontawesome.FontAwesome;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.server.auth.AccessAnnotationChecker;
+import es.opplus.application.components.FilterNavigationTab;
 import es.opplus.application.components.InboxNavigationTab;
 import es.opplus.application.components.layout.OppAppLayout;
 import es.opplus.application.components.layout.drawer.NavigationTab;
 import es.opplus.application.components.layout.drawer.NavigationTabs;
-import es.opplus.application.components.settings.SettingsComponent;
-import com.flowingcode.vaadin.addons.fontawesome.FontAwesome;
-import com.vaadin.flow.component.*;
-import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.server.auth.AccessAnnotationChecker;
-import com.vaadin.flow.shared.Registration;
+import es.opplus.application.data.PersonFilterData;
 import es.opplus.application.views.DebugView;
+import es.opplus.application.views.messages.MessagesView;
 import es.opplus.application.views.components.ComponentsView;
 import es.opplus.application.views.folders.FoldersView;
 import es.opplus.application.views.settings.SettingsView;
-import es.opplus.application.views.tasks.TasksView;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -34,6 +33,7 @@ public class MainLayout extends OppAppLayout {
         //setPrimarySection(Section.DRAWER);
         addDrawerContent();
         setSettingsView(new SettingsView());
+        setMessagesView(new MessagesView());
     }
 
 
@@ -47,12 +47,13 @@ public class MainLayout extends OppAppLayout {
                         .label("Bandeja Tareas")
                         .counter("124.564")
                         .subTabs(
-                                new NavigationTab()
+                                new FilterNavigationTab()
+                                        .filter(new PersonFilterData())
                                         .icon(FontAwesome.Solid.INBOX.create())
                                         .label("Pendientes")
                                         .counter("124.564")
                                         .trash()
-                                        .path(TasksView.class)
+                                        .path(FoldersView.class)
                                         .build(),
                                 new NavigationTab()
                                         .icon(FontAwesome.Solid.INBOX.create())
@@ -108,8 +109,80 @@ public class MainLayout extends OppAppLayout {
                         .icon(FontAwesome.Solid.BUILDING.create())
                         .label("Componentes")
                         .path(ComponentsView.class)
+                        .build(),
+                new NavigationTab()
+                        .icon(FontAwesome.Solid.FOLDER_TREE.create())
+                        .label("Arbol")
+                        .counter("124.564")
+                        .subTabs(
+                                new NavigationTab()
+                                        .icon(FontAwesome.Solid.FOLDER_TREE.create())
+                                        .label("Rama1 (Nivel 2)")
+                                        .subTabs(
+                                                new NavigationTab()
+                                                        .icon(FontAwesome.Solid.FOLDER_TREE.create())
+                                                        .label("Hoja1 (Nivel 3)")
+                                                        .path(FoldersView.class)
+                                                        .subTabs(
+                                                                new NavigationTab()
+                                                                        .icon(FontAwesome.Solid.FILE_PDF.create())
+                                                                        .label("... (Nivel n)")
+                                                                        .path(FoldersView.class)
+                                                                        .build()
+                                                        )
+                                                        .build(),
+                                                new NavigationTab()
+                                                        .icon(FontAwesome.Solid.FILE_CSV.create())
+                                                        .label("Hoja 2 (Nivel 3)")
+                                                        .path(FoldersView.class)
+                                                        .build(),
+                                                new NavigationTab()
+                                                        .icon(FontAwesome.Solid.FILE_AUDIO.create())
+                                                        .label("Hoja 3 (Nivel 3)")
+                                                        .path(FoldersView.class)
+                                                        .build(),
+                                                new NavigationTab()
+                                                        .icon(FontAwesome.Solid.FILE_ALT.create())
+                                                        .label("Hoja 4 (Nivel 3)")
+                                                        .path(FoldersView.class)
+                                                        .build()
+                                        )
+                                        .build(),
+                                new NavigationTab()
+                                        .icon(FontAwesome.Solid.FOLDER_TREE.create())
+                                        .label("Rama2 (Nivel 2)")
+                                        .subTabs(
+                                                new NavigationTab()
+                                                        .icon(FontAwesome.Solid.FOLDER_TREE.create())
+                                                        .label("Hoja1 (Nivel 3)")
+                                                        .path(FoldersView.class)
+                                                        .subTabs(
+                                                                new NavigationTab()
+                                                                        .icon(FontAwesome.Solid.FILE_PDF.create())
+                                                                        .label("... (Nivel n)")
+                                                                        .path(FoldersView.class)
+                                                                        .build()
+                                                        )
+                                                        .build(),
+                                                new NavigationTab()
+                                                        .icon(FontAwesome.Solid.FILE_CSV.create())
+                                                        .label("Hoja 2 (Nivel 3)")
+                                                        .path(FoldersView.class)
+                                                        .build(),
+                                                new NavigationTab()
+                                                        .icon(FontAwesome.Solid.FILE_AUDIO.create())
+                                                        .label("Hoja 3 (Nivel 3)")
+                                                        .path(FoldersView.class)
+                                                        .build(),
+                                                new NavigationTab()
+                                                        .icon(FontAwesome.Solid.FILE_ALT.create())
+                                                        .label("Hoja 4 (Nivel 3)")
+                                                        .path(FoldersView.class)
+                                                        .build()
+                                        )
+                                        .build()
+                        )
                         .build()
-
         );
 
         if (accessChecker.hasAccess(DebugView.class)) {

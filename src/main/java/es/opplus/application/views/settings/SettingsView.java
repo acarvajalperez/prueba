@@ -1,8 +1,6 @@
 package es.opplus.application.views.settings;
 
 import com.flowingcode.vaadin.addons.fontawesome.FontAwesome;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -13,7 +11,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.Lumo;
 import es.opplus.application.components.ColorSelect;
-import es.opplus.application.components.layout.events.AddFilterEvent;
 import es.opplus.application.components.layout.events.ChangeTitleColorEvent;
 import es.opplus.application.components.views.AbstractSettingsView;
 import es.opplus.application.MainLayout;
