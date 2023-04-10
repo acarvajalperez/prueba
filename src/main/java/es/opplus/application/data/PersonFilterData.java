@@ -1,6 +1,6 @@
 package es.opplus.application.data;
 
-import es.opplus.application.components.Filter;
+import es.opplus.application.components.views.filter.Filter;
 import lombok.*;
 
 @Data

@@ -77,7 +77,9 @@ public class SettingsView extends AbstractSettingsView {
         formLayout.addFormItem(darkTheme, "Tema oscuro");
         formLayout.addFormItem(themeSelect, "Tema");
         formLayout.addFormItem(colorTitle, "Color del titulo");
+
         add(formLayout);
+
     }
 
     private void setTheme(boolean dark) {

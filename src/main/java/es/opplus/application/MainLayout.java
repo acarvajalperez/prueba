@@ -7,7 +7,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
-import es.opplus.application.components.FilterNavigationTab;
+import es.opplus.application.components.views.filter.FilterNavigationTab;
 import es.opplus.application.components.InboxNavigationTab;
 import es.opplus.application.components.layout.OppAppLayout;
 import es.opplus.application.components.layout.drawer.NavigationTab;
@@ -200,7 +200,8 @@ public class MainLayout extends OppAppLayout {
     private Component getNewOpperationButton() {
 
         Button button = new Button("Nueva operación");
-        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        button.setIcon(FontAwesome.Solid.PLUS.create());
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE, ButtonVariant.LUMO_ICON);
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();

@@ -8,7 +8,8 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.shared.Registration;
 import es.opplus.application.components.layout.drawer.NavigationTab;
 import es.opplus.application.components.layout.events.AddPersonFilterEvent;
-import es.opplus.application.components.views.FilterView;
+import es.opplus.application.components.views.filter.FilterNavigationTab;
+import es.opplus.application.components.views.filter.FilterView;
 import es.opplus.application.data.PersonFilterData;
 import es.opplus.application.views.folders.FoldersView;
 

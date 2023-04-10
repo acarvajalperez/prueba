@@ -1,32 +1,29 @@
 package es.opplus.application.views.folders;
 
-import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.router.*;
-import es.opplus.application.components.dialogs.AddFilterDialogForm;
-import es.opplus.application.components.dialogs.FormDialog;
-import es.opplus.application.components.views.FilterView;
-import es.opplus.application.data.PersonFilterData;
-import es.opplus.application.data.entity.SamplePerson;
-import es.opplus.application.data.service.SamplePersonService;
-import es.opplus.application.MainLayout;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.router.*;
+import es.opplus.application.components.dialogs.AddFilterDialogForm;
+import es.opplus.application.components.dialogs.FormDialog;
+import es.opplus.application.components.views.filter.FilterView;
+import es.opplus.application.data.PersonFilterData;
+import es.opplus.application.data.entity.SamplePerson;
+import es.opplus.application.data.service.SamplePersonService;
+import es.opplus.application.MainLayout;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.springframework.data.domain.PageRequest;
@@ -36,7 +33,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @PageTitle("Expedientes")
 @Route(value = "folders", layout = MainLayout.class)
@@ -47,9 +43,10 @@ public class FoldersView extends FilterView<PersonFilterData> {
 
     public Binder<PersonFilterData> personDataBinder = new Binder<>();
     private Grid<SamplePerson> grid;
-    private Filters filters;
+    private FilterForm filters;
     private final SamplePersonService samplePersonService;
     private PersonFilterData personFilterData;
+    private boolean filterVisible;
 
     public FoldersView(SamplePersonService SamplePersonService) {
         this.samplePersonService = SamplePersonService;
@@ -57,36 +54,15 @@ public class FoldersView extends FilterView<PersonFilterData> {
         setSizeFull();
         addClassNames("gridwith-filters-view");
 
-        filters = new Filters(() -> refreshGrid());
-        VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid());
+        filters = new FilterForm(this, this::refreshGrid);
+        //filters.removeClassName("px-l");
+        filters.removeClassName("py-m");
+        //filters.setVisible(true);
+        VerticalLayout layout = new VerticalLayout(filters, createGrid());
         layout.setSizeFull();
         layout.setPadding(false);
         layout.setSpacing(false);
         add(layout);
-    }
-
-    private HorizontalLayout createMobileFilters() {
-        // Mobile version
-        HorizontalLayout mobileFilters = new HorizontalLayout();
-        mobileFilters.setWidthFull();
-        mobileFilters.addClassNames(LumoUtility.Padding.MEDIUM, LumoUtility.BoxSizing.BORDER,
-                LumoUtility.AlignItems.CENTER);
-        mobileFilters.addClassName("mobile-filters");
-
-        Icon mobileIcon = new Icon("lumo", "plus");
-        Span filtersHeading = new Span("TaskFilterForm");
-        mobileFilters.add(mobileIcon, filtersHeading);
-        mobileFilters.setFlexGrow(1, filtersHeading);
-        mobileFilters.addClickListener(e -> {
-            if (filters.getClassNames().contains("visible")) {
-                filters.removeClassName("visible");
-                mobileIcon.getElement().setAttribute("icon", "lumo:plus");
-            } else {
-                filters.addClassName("visible");
-                mobileIcon.getElement().setAttribute("icon", "lumo:minus");
-            }
-        });
-        return mobileFilters;
     }
 
     @Override
@@ -98,9 +74,46 @@ public class FoldersView extends FilterView<PersonFilterData> {
         System.out.println("Ha llegado el parametro " + personFilterData);
     }
 
+    @Override
+    public boolean isFilterVisible() {
+        return filterVisible;
+    }
 
-    public class Filters extends Div implements Specification<SamplePerson> {
+    @Override
+    public void setFilterVisible(boolean visible) {
+        filterVisible = visible;
+        if (visible)
+            filters.setHeight("auto");
+        else
+            filters.setHeight("0px");
+    }
 
+    private Component createGrid() {
+        grid = new Grid<>(SamplePerson.class, false);
+        grid.addColumn("firstName").setAutoWidth(true);
+        grid.addColumn("lastName").setAutoWidth(true);
+        grid.addColumn("email").setAutoWidth(true);
+        grid.addColumn("phone").setAutoWidth(true);
+        grid.addColumn("dateOfBirth").setAutoWidth(true);
+        grid.addColumn("occupation").setAutoWidth(true);
+        grid.addColumn("role").setAutoWidth(true);
+
+        grid.setItems(query -> samplePersonService.list(
+                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)),
+                filters).stream());
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.addClassNames(LumoUtility.Border.TOP, LumoUtility.BorderColor.CONTRAST_10);
+
+        return grid;
+    }
+
+    private void refreshGrid() {
+        grid.getDataProvider().refreshAll();
+    }
+
+    public static class FilterForm extends Div implements Specification<SamplePerson> {
+
+        private final FoldersView foldersView;
         private final TextField name = new TextField("Name");
         private final TextField phone = new TextField("Phone");
         private final DatePicker startDate = new DatePicker("Date of Birth");
@@ -108,20 +121,17 @@ public class FoldersView extends FilterView<PersonFilterData> {
         private final MultiSelectComboBox<String> occupations = new MultiSelectComboBox<>("Occupation");
         private final CheckboxGroup<String> roles = new CheckboxGroup<>("Role");
 
-        public Filters(Runnable onSearch) {
+        public FilterForm(FoldersView foldersView, Runnable onSearch) {
+            this.addClassName("new-app-layout-filter-form");
+            this.foldersView = foldersView;
 
-            personDataBinder.forField(name)
-                    .bind(PersonFilterData::getName, PersonFilterData::setName);
-
-            personDataBinder.forField(phone)
-                    .bind(PersonFilterData::getPhone, PersonFilterData::setPhone);
-
-            personDataBinder.setBean(personFilterData);
+            foldersView.personDataBinder.forField(name).bind(PersonFilterData::getName, PersonFilterData::setName);
+            foldersView.personDataBinder.forField(phone).bind(PersonFilterData::getPhone, PersonFilterData::setPhone);
+            foldersView.personDataBinder.setBean(foldersView.personFilterData);
 
             setWidthFull();
             addClassName("filter-layout");
-            addClassNames(LumoUtility.Padding.Horizontal.LARGE, LumoUtility.Padding.Vertical.MEDIUM,
-                    LumoUtility.BoxSizing.BORDER);
+            addClassNames(LumoUtility.Padding.Horizontal.LARGE, LumoUtility.Padding.Vertical.MEDIUM, LumoUtility.BoxSizing.BORDER);
             name.setPlaceholder("First or last name");
 
             occupations.setItems("Insurance Clerk", "Mortarman", "Beer Coil Cleaner", "Scale Attendant");
@@ -133,7 +143,7 @@ public class FoldersView extends FilterView<PersonFilterData> {
             Button filterBtn = new Button("Guardar como filtro");
             filterBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             filterBtn.addClickListener(event -> {
-                new FormDialog(new AddFilterDialogForm(personDataBinder.getBean())).open();
+                new FormDialog(new AddFilterDialogForm(foldersView.personDataBinder.getBean().clone() )).open();
             });
 
             Button resetBtn = new Button("Reset");
@@ -168,7 +178,7 @@ public class FoldersView extends FilterView<PersonFilterData> {
             setAriaLabel(endDate, "To date");
 
             FlexLayout dateRangeComponent = new FlexLayout(startDate, new Text(" – "), endDate);
-            dateRangeComponent.setAlignItems(FlexComponent.Alignment.BASELINE);
+            dateRangeComponent.setAlignItems(Alignment.BASELINE);
             dateRangeComponent.addClassName(LumoUtility.Gap.XSMALL);
 
             return dateRangeComponent;
@@ -242,7 +252,7 @@ public class FoldersView extends FilterView<PersonFilterData> {
         }
 
         private Expression<String> ignoreCharacters(String characters, CriteriaBuilder criteriaBuilder,
-                Expression<String> inExpression) {
+                                                    Expression<String> inExpression) {
             Expression<String> expression = inExpression;
             for (int i = 0; i < characters.length(); i++) {
                 expression = criteriaBuilder.function("replace", String.class, expression,
@@ -252,28 +262,4 @@ public class FoldersView extends FilterView<PersonFilterData> {
         }
 
     }
-
-    private Component createGrid() {
-        grid = new Grid<>(SamplePerson.class, false);
-        grid.addColumn("firstName").setAutoWidth(true);
-        grid.addColumn("lastName").setAutoWidth(true);
-        grid.addColumn("email").setAutoWidth(true);
-        grid.addColumn("phone").setAutoWidth(true);
-        grid.addColumn("dateOfBirth").setAutoWidth(true);
-        grid.addColumn("occupation").setAutoWidth(true);
-        grid.addColumn("role").setAutoWidth(true);
-
-        grid.setItems(query -> samplePersonService.list(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)),
-                filters).stream());
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.addClassNames(LumoUtility.Border.TOP, LumoUtility.BorderColor.CONTRAST_10);
-
-        return grid;
-    }
-
-    private void refreshGrid() {
-        grid.getDataProvider().refreshAll();
-    }
-
 }
